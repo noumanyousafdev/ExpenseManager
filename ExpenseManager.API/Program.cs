@@ -24,7 +24,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddTokenProvider<DataProtectorTokenProvider<User>>("GMS")
+    .AddTokenProvider<DataProtectorTokenProvider<User>>("ExpenseManager")
     .AddDefaultTokenProviders();
 
 builder.Services.Configure<IdentityOptions>(options =>
@@ -84,6 +84,17 @@ builder.Services.AddSwaggerGen(option =>
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 var app = builder.Build();
+
+// Apply pending migrations
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<ApplicationDbContext>();
+    await context.Database.MigrateAsync(); // Apply migrations
+
+    // Seed initial data
+    await SeedData.SeedInitial(services);
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

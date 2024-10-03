@@ -1,4 +1,10 @@
-﻿using System;
+﻿using ExpenseManager.Models.Entities;
+using ExpenseManager.Service.Dtos.Login;
+using ExpenseManager.Service.Dtos.Register;
+using ExpenseManager.Service.Helper;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +14,13 @@ namespace ExpenseManager.Service.Services.Authentication
 {
     public interface IAuthService
     {
+        Task<ServiceResponse<string>> Register(RegisterDto registerDto);
+        Task<ServiceResponse<string>> Login(LoginDto loginDto);
+        Task<ServiceResponse<string>> AssignRoles(User user, List<string> roles);
+        ServiceResponse<string> CreateJwtToken(User user, List<string> roles);
+
+
     }
+
+
 }
