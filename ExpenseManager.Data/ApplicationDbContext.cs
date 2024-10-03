@@ -21,10 +21,20 @@ namespace ExpenseManager.Data
 
 
         public ApplicationDbContext(DbContextOptions options) : base(options) { }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            // For Expense entity
+            modelBuilder.Entity<Expense>()
+                .Property(e => e.Amount)
+                .HasColumnType("decimal(18,2)"); // Specify precision and scale
+
+            // For ExpenseForm entity
+            modelBuilder.Entity<ExpenseForm>()
+                .Property(e => e.TotalAmount)
+                .HasColumnType("decimal(18,2)"); // Specify precision and scale
         }
+
     }
 }

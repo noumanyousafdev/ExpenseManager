@@ -85,15 +85,27 @@ builder.Services.AddSwaggerGen(option =>
 builder.Services.AddEndpointsApiExplorer();
 var app = builder.Build();
 
-// Apply pending migrations
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    var context = services.GetRequiredService<ApplicationDbContext>();
-    await context.Database.MigrateAsync(); // Apply migrations
+//// Apply pending migrations
+//using (var scope = app.Services.CreateScope())
+//{
+//    var services = scope.ServiceProvider;
+//    var context = services.GetRequiredService<ApplicationDbContext>();
+//    await context.Database.MigrateAsync(); // Apply migrations
 
-    // Seed initial data
-    await SeedData.SeedInitial(services);
+//    // Seed initial data
+//    await SeedData.SeedInitial(services);
+//}
+try
+{
+    using var serviceScope = app.Services.GetService<IServiceScopeFactory>().CreateScope();
+    var context = serviceScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    await context.Database.MigrateAsync(); // Apply pending migrations
+    await SeedData.SeedInitial(serviceScope.ServiceProvider); // Seed data
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"An error occurred while migrating or seeding the database: {ex.Message}");
+    throw;
 }
 
 // Configure the HTTP request pipeline.
