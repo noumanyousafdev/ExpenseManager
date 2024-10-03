@@ -7,20 +7,8 @@ using System.Threading.Tasks;
 
 namespace ExpenseManager.Models.Entities
 {
-    public class Accountant : User, IBaseModel
+    public class Accountant : User
     {
-        public ICollection<ExpenseForm> PaidExpenseForms { get; set; }
-
-        [JsonIgnore] 
-        public bool IsDeleted { get; set; }
-
-        [JsonIgnore] 
-        public DateTime CreatedDate { get; set; } = DateTime.UtcNow; 
-
-        [JsonIgnore] 
-        public DateTime? UpdatedDate { get; set; }
-
-        [JsonIgnore] 
-        public DateTime? DeletedDate { get; set; }
+        public ICollection<Expense> PaidExpenseForms { get; set; }
     }
 }

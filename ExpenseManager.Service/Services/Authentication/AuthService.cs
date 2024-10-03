@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
@@ -28,7 +29,6 @@ namespace ExpenseManager.Service.Services.Authentication
             this.configuration = configuration;
         }
 
-        // Register a new user
         public async Task<ServiceResponse<string>> Register(RegisterDto registerDto)
         {
             var user = new User
@@ -43,11 +43,9 @@ namespace ExpenseManager.Service.Services.Authentication
 
             if (result.Succeeded)
             {
-                // Automatically assign default roles if none are specified
                 if (registerDto.Roles == null || !registerDto.Roles.Any())
                 {
-                    // Default roles to assign
-                    var defaultRoles = new List<string> { "Employee" }; // Change this based on your requirements
+                    var defaultRoles = new List<string> { "Employee" }; 
 
                     var roleAssignmentResult = await AssignRoles(user, defaultRoles);
                     if (!roleAssignmentResult.Success)
@@ -57,7 +55,6 @@ namespace ExpenseManager.Service.Services.Authentication
                 }
                 else
                 {
-                    // If roles are provided, assign roles
                     var roleAssignmentResult = await AssignRoles(user, registerDto.Roles);
                     if (!roleAssignmentResult.Success)
                     {
@@ -71,7 +68,6 @@ namespace ExpenseManager.Service.Services.Authentication
             return ServiceResponse<string>.ReturnFailed(400, result.Errors.Select(e => e.Description).ToList());
         }
 
-        // Assign roles to user
         public async Task<ServiceResponse<string>> AssignRoles(User user, List<string> roles)
         {
             foreach (var role in roles)
@@ -93,19 +89,36 @@ namespace ExpenseManager.Service.Services.Authentication
             return ServiceResponse<string>.ReturnResultWith200("Roles assigned successfully.");
         }
 
-        // Login and generate JWT token
         public async Task<ServiceResponse<string>> Login(LoginDto loginDto)
         {
-            var user = await userManager.FindByNameAsync(loginDto.UserName) ?? await userManager.FindByEmailAsync(loginDto.UserName);
+            User user;
 
+            if (!string.IsNullOrEmpty(loginDto.Email) && IsValidEmail(loginDto.Email))
+            {
+                // Attempt to find by email
+                user = await userManager.FindByEmailAsync(loginDto.Email);
+            }
+            else if (!string.IsNullOrEmpty(loginDto.UserName))
+            {
+                // Attempt to find by username
+                user = await userManager.FindByNameAsync(loginDto.UserName);
+            }
+            else
+            {
+                return ServiceResponse<string>.ReturnFailed(400, "Username or Email is required.");
+            }
+
+            // Check if the user exists and password is valid
             if (user == null || !await userManager.CheckPasswordAsync(user, loginDto.Password))
             {
                 return ServiceResponse<string>.ReturnFailed(401, "Invalid login credentials.");
             }
 
+            // Get user roles
             var roles = await userManager.GetRolesAsync(user);
             if (roles.Any())
             {
+                // Generate JWT token
                 var tokenResponse = CreateJwtToken(user, roles.ToList());
                 return tokenResponse;
             }
@@ -113,7 +126,11 @@ namespace ExpenseManager.Service.Services.Authentication
             return ServiceResponse<string>.ReturnFailed(401, "User has no assigned roles.");
         }
 
-        // Generate JWT Token
+        private bool IsValidEmail(string email)
+        {
+            return new EmailAddressAttribute().IsValid(email);
+        }
+
         public ServiceResponse<string> CreateJwtToken(User user, List<string> roles)
         {
             var claims = new List<Claim>

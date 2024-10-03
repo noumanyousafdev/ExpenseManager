@@ -14,13 +14,13 @@ namespace ExpenseManager.Service.Services.Authentication
 {
     public interface IAuthService
     {
+
         Task<ServiceResponse<string>> Register(RegisterDto registerDto);
-        Task<ServiceResponse<string>> Login(LoginDto loginDto);
+
         Task<ServiceResponse<string>> AssignRoles(User user, List<string> roles);
+
+        Task<ServiceResponse<string>> Login(LoginDto loginDto);
+
         ServiceResponse<string> CreateJwtToken(User user, List<string> roles);
-
-
     }
-
-
 }

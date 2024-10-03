@@ -24,7 +24,6 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddTokenProvider<DataProtectorTokenProvider<User>>("ExpenseManager")
     .AddDefaultTokenProviders();
 
 builder.Services.Configure<IdentityOptions>(options =>

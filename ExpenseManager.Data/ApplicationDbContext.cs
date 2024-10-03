@@ -14,8 +14,8 @@ namespace ExpenseManager.Data
         public DbSet<Employee> Employees { get; set; }
         public DbSet<Manager> Managers { get; set; }
         public DbSet<Accountant> Accountants { get; set; }
-        public DbSet<Expense> Expenses { get; set; }
-        public DbSet<ExpenseForm> ExpenseForms { get; set; }
+        public DbSet<ExpenseDetail> Expenses { get; set; }
+        public DbSet<Expense> ExpenseForms { get; set; }
         //public DbSet<ApprovalHistory> ApprovalHistories { get; set; }
         //public DbSet<Report> Reports { get; set; }
 
@@ -26,12 +26,12 @@ namespace ExpenseManager.Data
             base.OnModelCreating(modelBuilder);
 
             // For Expense entity
-            modelBuilder.Entity<Expense>()
+            modelBuilder.Entity<ExpenseDetail>()
                 .Property(e => e.Amount)
                 .HasColumnType("decimal(18,2)"); // Specify precision and scale
 
             // For ExpenseForm entity
-            modelBuilder.Entity<ExpenseForm>()
+            modelBuilder.Entity<Expense>()
                 .Property(e => e.TotalAmount)
                 .HasColumnType("decimal(18,2)"); // Specify precision and scale
         }
