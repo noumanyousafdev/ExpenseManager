@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ExpenseManager.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class InitalMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -165,7 +165,7 @@ namespace ExpenseManager.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ExpenseForms",
+                name: "ExpenseDetails",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -183,9 +183,9 @@ namespace ExpenseManager.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ExpenseForms", x => x.Id);
+                    table.PrimaryKey("PK_ExpenseDetails", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ExpenseForms_AspNetUsers_EmployeeIdId",
+                        name: "FK_ExpenseDetails_AspNetUsers_EmployeeIdId",
                         column: x => x.EmployeeIdId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
@@ -197,7 +197,8 @@ namespace ExpenseManager.Data.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ExpenseId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ApprovedById = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    ApprovedByIdId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    ApprovedById1 = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ApprovedDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
@@ -205,14 +206,19 @@ namespace ExpenseManager.Data.Migrations
                 {
                     table.PrimaryKey("PK_ApprovalHistories", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ApprovalHistories_AspNetUsers_ApprovedById",
-                        column: x => x.ApprovedById,
+                        name: "FK_ApprovalHistories_AspNetUsers_ApprovedById1",
+                        column: x => x.ApprovedById1,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_ApprovalHistories_ExpenseForms_ExpenseId",
+                        name: "FK_ApprovalHistories_AspNetUsers_ApprovedByIdId",
+                        column: x => x.ApprovedByIdId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_ApprovalHistories_ExpenseDetails_ExpenseId",
                         column: x => x.ExpenseId,
-                        principalTable: "ExpenseForms",
+                        principalTable: "ExpenseDetails",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -234,17 +240,22 @@ namespace ExpenseManager.Data.Migrations
                 {
                     table.PrimaryKey("PK_Expenses", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Expenses_ExpenseForms_ExpenseId",
+                        name: "FK_Expenses_ExpenseDetails_ExpenseId",
                         column: x => x.ExpenseId,
-                        principalTable: "ExpenseForms",
+                        principalTable: "ExpenseDetails",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_ApprovalHistories_ApprovedById",
+                name: "IX_ApprovalHistories_ApprovedById1",
                 table: "ApprovalHistories",
-                column: "ApprovedById");
+                column: "ApprovedById1");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ApprovalHistories_ApprovedByIdId",
+                table: "ApprovalHistories",
+                column: "ApprovedByIdId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ApprovalHistories_ExpenseId",
@@ -296,8 +307,8 @@ namespace ExpenseManager.Data.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ExpenseForms_EmployeeIdId",
-                table: "ExpenseForms",
+                name: "IX_ExpenseDetails_EmployeeIdId",
+                table: "ExpenseDetails",
                 column: "EmployeeIdId");
 
             migrationBuilder.CreateIndex(
@@ -334,7 +345,7 @@ namespace ExpenseManager.Data.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "ExpenseForms");
+                name: "ExpenseDetails");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

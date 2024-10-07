@@ -14,7 +14,7 @@ namespace ExpenseManager.Models.Entities
         public Expense Expense { get; set; } 
 
         // Foreign key to link to the User (approver)
-        public string ApprovedById { get; set; }
+        public User ApprovedById { get; set; }
         public User ApprovedBy { get; set; } 
         public string Status { get; set; } // e.g., "Approved", "Rejected", "Pending"
         public DateTime ApprovedDate { get; set; } = DateTime.UtcNow; 

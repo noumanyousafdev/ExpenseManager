@@ -12,8 +12,9 @@ namespace ExpenseManager.Models.Entities
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public string ManagerId { get; set; } 
+        public string? ManagerId { get; set; } 
         public virtual User Manager { get; set; } 
     }
 }
- 
+
+// Virtual keyword 

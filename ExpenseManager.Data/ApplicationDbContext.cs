@@ -12,7 +12,7 @@ namespace ExpenseManager.Data
     public class ApplicationDbContext : IdentityDbContext<User>
     {
         public DbSet<ExpenseDetail> Expenses { get; set; }
-        public DbSet<Expense> ExpenseForms { get; set; }
+        public DbSet<Expense> ExpenseDetails { get; set; }
         public DbSet<ApprovalHistory> ApprovalHistories { get; set; }
 
 

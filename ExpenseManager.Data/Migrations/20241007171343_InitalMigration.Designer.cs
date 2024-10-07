@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ExpenseManager.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241007143026_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20241007171343_InitalMigration")]
+    partial class InitalMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -31,7 +31,10 @@ namespace ExpenseManager.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("ApprovedById")
+                    b.Property<string>("ApprovedById1")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ApprovedByIdId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("ApprovedDate")
@@ -45,7 +48,9 @@ namespace ExpenseManager.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ApprovedById");
+                    b.HasIndex("ApprovedById1");
+
+                    b.HasIndex("ApprovedByIdId");
 
                     b.HasIndex("ExpenseId");
 
@@ -95,7 +100,7 @@ namespace ExpenseManager.Data.Migrations
 
                     b.HasIndex("EmployeeIdId");
 
-                    b.ToTable("ExpenseForms");
+                    b.ToTable("ExpenseDetails");
                 });
 
             modelBuilder.Entity("ExpenseManager.Models.Entities.ExpenseDetail", b =>
@@ -345,7 +350,11 @@ namespace ExpenseManager.Data.Migrations
                 {
                     b.HasOne("ExpenseManager.Models.Entities.User", "ApprovedBy")
                         .WithMany()
-                        .HasForeignKey("ApprovedById");
+                        .HasForeignKey("ApprovedById1");
+
+                    b.HasOne("ExpenseManager.Models.Entities.User", "ApprovedById")
+                        .WithMany()
+                        .HasForeignKey("ApprovedByIdId");
 
                     b.HasOne("ExpenseManager.Models.Entities.Expense", "Expense")
                         .WithMany()
@@ -354,6 +363,8 @@ namespace ExpenseManager.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("ApprovedBy");
+
+                    b.Navigation("ApprovedById");
 
                     b.Navigation("Expense");
                 });

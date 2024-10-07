@@ -13,10 +13,13 @@ namespace ExpenseManager.Models.Entities
         public decimal TotalAmount { get; set; }  
         public string Currency { get; set; }
         public string Description { get; set; }
-        public string Status { get; set; } 
+        public string Status { get; set; } // Approved ,  Pending , Rejected  
         public string ReasonForRejection { get; set; } 
         public DateTime SubmissionDate { get; set; } = DateTime.UtcNow;
         public ICollection<ExpenseDetail> ExpenseDetails { get; set; } = new List<ExpenseDetail>(); 
 
     }
 }
+
+
+// 
