@@ -30,22 +30,9 @@ namespace ExpenseManager.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Discriminator = table.Column<string>(type: "nvarchar(13)", maxLength: 13, nullable: false),
-                    Accountant_IsDeleted = table.Column<bool>(type: "bit", nullable: true),
-                    Accountant_CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Accountant_UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Accountant_DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Employee_IsDeleted = table.Column<bool>(type: "bit", nullable: true),
-                    Employee_CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Employee_UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Employee_DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ManagerId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -182,15 +169,13 @@ namespace ExpenseManager.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    EmployeeId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    EmployeeIdId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Currency = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ReasonForRejection = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Currency = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ReasonForRejection = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SubmissionDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    AccountantId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    ManagerId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -200,21 +185,36 @@ namespace ExpenseManager.Data.Migrations
                 {
                     table.PrimaryKey("PK_ExpenseForms", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ExpenseForms_AspNetUsers_AccountantId",
-                        column: x => x.AccountantId,
+                        name: "FK_ExpenseForms_AspNetUsers_EmployeeIdId",
+                        column: x => x.EmployeeIdId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ApprovalHistories",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ExpenseId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ApprovedById = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ApprovedDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ApprovalHistories", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ApprovalHistories_AspNetUsers_ApprovedById",
+                        column: x => x.ApprovedById,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_ExpenseForms_AspNetUsers_EmployeeId",
-                        column: x => x.EmployeeId,
-                        principalTable: "AspNetUsers",
+                        name: "FK_ApprovalHistories_ExpenseForms_ExpenseId",
+                        column: x => x.ExpenseId,
+                        principalTable: "ExpenseForms",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ExpenseForms_AspNetUsers_ManagerId",
-                        column: x => x.ManagerId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -222,10 +222,9 @@ namespace ExpenseManager.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ExpenseFormId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ExpenseId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -235,12 +234,22 @@ namespace ExpenseManager.Data.Migrations
                 {
                     table.PrimaryKey("PK_Expenses", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Expenses_ExpenseForms_ExpenseFormId",
-                        column: x => x.ExpenseFormId,
+                        name: "FK_Expenses_ExpenseForms_ExpenseId",
+                        column: x => x.ExpenseId,
                         principalTable: "ExpenseForms",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ApprovalHistories_ApprovedById",
+                table: "ApprovalHistories",
+                column: "ApprovedById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ApprovalHistories_ExpenseId",
+                table: "ApprovalHistories",
+                column: "ExpenseId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -287,29 +296,22 @@ namespace ExpenseManager.Data.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ExpenseForms_AccountantId",
+                name: "IX_ExpenseForms_EmployeeIdId",
                 table: "ExpenseForms",
-                column: "AccountantId");
+                column: "EmployeeIdId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ExpenseForms_EmployeeId",
-                table: "ExpenseForms",
-                column: "EmployeeId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ExpenseForms_ManagerId",
-                table: "ExpenseForms",
-                column: "ManagerId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Expenses_ExpenseFormId",
+                name: "IX_Expenses_ExpenseId",
                 table: "Expenses",
-                column: "ExpenseFormId");
+                column: "ExpenseId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "ApprovalHistories");
+
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 

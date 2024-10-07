@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace ExpenseManager.Models.Entities
 {
-    public class Expense 
+    public class Expense : BaseModel
     {
         public Guid Id { get; set; } 
-        public string EmployeeId { get; set; } 
+        public User EmployeeId {  get; set; }
         public decimal TotalAmount { get; set; }  
         public string Currency { get; set; }
         public string Description { get; set; }
@@ -17,6 +17,6 @@ namespace ExpenseManager.Models.Entities
         public string ReasonForRejection { get; set; } 
         public DateTime SubmissionDate { get; set; } = DateTime.UtcNow;
         public ICollection<ExpenseDetail> ExpenseDetails { get; set; } = new List<ExpenseDetail>(); 
-        public Employee Employee { get; set; } 
+
     }
 }

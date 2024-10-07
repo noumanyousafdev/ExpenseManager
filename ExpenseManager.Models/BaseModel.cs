@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ExpenseManager.Models
 {
-    public class BaseModel : IDelete, IUpdate
+    public class BaseModel : IDelete
     {
         public bool IsDeleted { get; set; }
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;

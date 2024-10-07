@@ -31,12 +31,24 @@ namespace ExpenseManager.Service.Services.Authentication
 
         public async Task<ServiceResponse<string>> Register(RegisterDto registerDto)
         {
+            // Check if the ManagerId is provided and exists
+            User manager = null;
+            if (!string.IsNullOrEmpty(registerDto.ManagerId))
+            {
+                manager = await userManager.FindByIdAsync(registerDto.ManagerId);
+                if (manager == null)
+                {
+                    return ServiceResponse<string>.ReturnFailed(400, "Manager not found.");
+                }
+            }
+
             var user = new User
             {
                 UserName = registerDto.UserName,
                 Email = registerDto.Email,
                 FirstName = registerDto.FirstName,
-                LastName = registerDto.LastName
+                LastName = registerDto.LastName,
+                ManagerId = registerDto.ManagerId 
             };
 
             var result = await userManager.CreateAsync(user, registerDto.Password);
@@ -45,8 +57,7 @@ namespace ExpenseManager.Service.Services.Authentication
             {
                 if (registerDto.Roles == null || !registerDto.Roles.Any())
                 {
-                    var defaultRoles = new List<string> { "Employee" }; 
-
+                    var defaultRoles = new List<string> { "Employee" };
                     var roleAssignmentResult = await AssignRoles(user, defaultRoles);
                     if (!roleAssignmentResult.Success)
                     {
@@ -89,41 +100,41 @@ namespace ExpenseManager.Service.Services.Authentication
             return ServiceResponse<string>.ReturnResultWith200("Roles assigned successfully.");
         }
 
-        public async Task<ServiceResponse<string>> Login(LoginDto loginDto)
+        public async Task<ServiceResponse<LoginResponseDto>> Login(LoginDto loginDto)
         {
-            User user;
+            User user = null;
 
-            if (!string.IsNullOrEmpty(loginDto.Email) && IsValidEmail(loginDto.Email))
+            if (IsValidEmail(loginDto.UsernameOrEmail))
             {
-                // Attempt to find by email
-                user = await userManager.FindByEmailAsync(loginDto.Email);
-            }
-            else if (!string.IsNullOrEmpty(loginDto.UserName))
-            {
-                // Attempt to find by username
-                user = await userManager.FindByNameAsync(loginDto.UserName);
+                user = await userManager.FindByEmailAsync(loginDto.UsernameOrEmail);
             }
             else
             {
-                return ServiceResponse<string>.ReturnFailed(400, "Username or Email is required.");
+                user = await userManager.FindByNameAsync(loginDto.UsernameOrEmail);
             }
 
-            // Check if the user exists and password is valid
             if (user == null || !await userManager.CheckPasswordAsync(user, loginDto.Password))
             {
-                return ServiceResponse<string>.ReturnFailed(401, "Invalid login credentials.");
+                return ServiceResponse<LoginResponseDto>.ReturnFailed(401, "Invalid login credentials.");
             }
 
-            // Get user roles
             var roles = await userManager.GetRolesAsync(user);
-            if (roles.Any())
+            if (!roles.Any())
             {
-                // Generate JWT token
-                var tokenResponse = CreateJwtToken(user, roles.ToList());
-                return tokenResponse;
+                return ServiceResponse<LoginResponseDto>.ReturnFailed(401, "User has no assigned roles.");
             }
 
-            return ServiceResponse<string>.ReturnFailed(401, "User has no assigned roles.");
+            var tokenResponse = CreateJwtToken(user, roles.ToList());
+            var loginResponseDto = new LoginResponseDto
+            {
+                JwtToken = tokenResponse.JwtToken,
+                Username = user.UserName,
+                UserId = user.Id,
+                Roles = roles.ToList(),
+                Expiration = tokenResponse.Expiration
+            };
+
+            return ServiceResponse<LoginResponseDto>.ReturnResultWith200(loginResponseDto);
         }
 
         private bool IsValidEmail(string email)
@@ -131,7 +142,7 @@ namespace ExpenseManager.Service.Services.Authentication
             return new EmailAddressAttribute().IsValid(email);
         }
 
-        public ServiceResponse<string> CreateJwtToken(User user, List<string> roles)
+        public TokenResponseDto CreateJwtToken(User user, List<string> roles)
         {
             var claims = new List<Claim>
             {
@@ -148,16 +159,24 @@ namespace ExpenseManager.Service.Services.Authentication
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
+            var expiration = DateTime.UtcNow.AddMinutes(int.Parse(configuration["Jwt:ExpirationInMinutes"]));
+
             var token = new JwtSecurityToken(
                 issuer: configuration["Jwt:Issuer"],
                 audience: configuration["Jwt:Audience"],
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(30),
+                expires: expiration,
                 signingCredentials: credentials
             );
 
             var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
-            return ServiceResponse<string>.ReturnResultWith200(tokenString);
+
+            return new TokenResponseDto
+            {
+                JwtToken = tokenString,
+                Expiration = expiration
+            };
         }
     }
-}
+
+ }

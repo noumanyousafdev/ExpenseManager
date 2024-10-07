@@ -19,8 +19,8 @@ namespace ExpenseManager.Service.Services.Authentication
 
         Task<ServiceResponse<string>> AssignRoles(User user, List<string> roles);
 
-        Task<ServiceResponse<string>> Login(LoginDto loginDto);
+        Task<ServiceResponse<LoginResponseDto>> Login(LoginDto loginDto);
 
-        ServiceResponse<string> CreateJwtToken(User user, List<string> roles);
+        TokenResponseDto CreateJwtToken(User user, List<string> roles);
     }
 }

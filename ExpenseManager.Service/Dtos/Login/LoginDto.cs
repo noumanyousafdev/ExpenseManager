@@ -9,14 +9,12 @@ namespace ExpenseManager.Service.Dtos.Login
 {
     public class LoginDto
     {
-        // Either Email or UserName is required
-        [DataType(DataType.EmailAddress)]
-        public string Email { get; set; }
+        [Required(ErrorMessage = "Username or Email is required.")]
+        public string UsernameOrEmail { get; set; }
 
-        public string UserName { get; set; }
-
-        [Required]
+        [Required(ErrorMessage = "Password is required.")]
         [DataType(DataType.Password)]
         public string Password { get; set; }
     }
+
 }

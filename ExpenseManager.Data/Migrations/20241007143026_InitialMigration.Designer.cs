@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ExpenseManager.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241003114846_InitialMigration")]
+    [Migration("20241007143026_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -25,83 +25,61 @@ namespace ExpenseManager.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("ExpenseManager.Models.Entities.ApprovalHistory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ApprovedById")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("ApprovedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("ExpenseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApprovedById");
+
+                    b.HasIndex("ExpenseId");
+
+                    b.ToTable("ApprovalHistories");
+                });
+
             modelBuilder.Entity("ExpenseManager.Models.Entities.Expense", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DeletedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("ExpenseFormId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ExpenseFormId");
-
-                    b.ToTable("Expenses");
-                });
-
-            modelBuilder.Entity("ExpenseManager.Models.Entities.ExpenseForm", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("AccountantId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Currency")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("DeletedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("EmployeeId")
-                        .IsRequired()
+                    b.Property<string>("EmployeeIdId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<string>("ManagerId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("ReasonForRejection")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Status")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("SubmissionDate")
@@ -115,13 +93,43 @@ namespace ExpenseManager.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AccountantId");
-
-                    b.HasIndex("EmployeeId");
-
-                    b.HasIndex("ManagerId");
+                    b.HasIndex("EmployeeIdId");
 
                     b.ToTable("ExpenseForms");
+                });
+
+            modelBuilder.Entity("ExpenseManager.Models.Entities.ExpenseDetail", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("ExpenseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ExpenseId");
+
+                    b.ToTable("Expenses");
                 });
 
             modelBuilder.Entity("ExpenseManager.Models.Entities.User", b =>
@@ -136,11 +144,6 @@ namespace ExpenseManager.Data.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasMaxLength(13)
-                        .HasColumnType("nvarchar(13)");
-
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -149,11 +152,9 @@ namespace ExpenseManager.Data.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("FirstName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LastName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("LockoutEnabled")
@@ -161,6 +162,9 @@ namespace ExpenseManager.Data.Migrations
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ManagerId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -191,6 +195,8 @@ namespace ExpenseManager.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ManagerId");
+
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -200,10 +206,6 @@ namespace ExpenseManager.Data.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
-
-                    b.HasDiscriminator().HasValue("User");
-
-                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -339,126 +341,50 @@ namespace ExpenseManager.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("ExpenseManager.Models.Entities.Accountant", b =>
+            modelBuilder.Entity("ExpenseManager.Models.Entities.ApprovalHistory", b =>
                 {
-                    b.HasBaseType("ExpenseManager.Models.Entities.User");
+                    b.HasOne("ExpenseManager.Models.Entities.User", "ApprovedBy")
+                        .WithMany()
+                        .HasForeignKey("ApprovedById");
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
+                    b.HasOne("ExpenseManager.Models.Entities.Expense", "Expense")
+                        .WithMany()
+                        .HasForeignKey("ExpenseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Property<DateTime?>("DeletedDate")
-                        .HasColumnType("datetime2");
+                    b.Navigation("ApprovedBy");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.ToTable("AspNetUsers", t =>
-                        {
-                            t.Property("CreatedDate")
-                                .HasColumnName("Accountant_CreatedDate");
-
-                            t.Property("DeletedDate")
-                                .HasColumnName("Accountant_DeletedDate");
-
-                            t.Property("IsDeleted")
-                                .HasColumnName("Accountant_IsDeleted");
-
-                            t.Property("UpdatedDate")
-                                .HasColumnName("Accountant_UpdatedDate");
-                        });
-
-                    b.HasDiscriminator().HasValue("Accountant");
-                });
-
-            modelBuilder.Entity("ExpenseManager.Models.Entities.Employee", b =>
-                {
-                    b.HasBaseType("ExpenseManager.Models.Entities.User");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DeletedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ManagerId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasIndex("ManagerId");
-
-                    b.ToTable("AspNetUsers", t =>
-                        {
-                            t.Property("CreatedDate")
-                                .HasColumnName("Employee_CreatedDate");
-
-                            t.Property("DeletedDate")
-                                .HasColumnName("Employee_DeletedDate");
-
-                            t.Property("IsDeleted")
-                                .HasColumnName("Employee_IsDeleted");
-
-                            t.Property("UpdatedDate")
-                                .HasColumnName("Employee_UpdatedDate");
-                        });
-
-                    b.HasDiscriminator().HasValue("Employee");
-                });
-
-            modelBuilder.Entity("ExpenseManager.Models.Entities.Manager", b =>
-                {
-                    b.HasBaseType("ExpenseManager.Models.Entities.User");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DeletedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasDiscriminator().HasValue("Manager");
+                    b.Navigation("Expense");
                 });
 
             modelBuilder.Entity("ExpenseManager.Models.Entities.Expense", b =>
                 {
-                    b.HasOne("ExpenseManager.Models.Entities.ExpenseForm", "ExpenseForm")
-                        .WithMany("Expenses")
-                        .HasForeignKey("ExpenseFormId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("ExpenseManager.Models.Entities.User", "EmployeeId")
+                        .WithMany()
+                        .HasForeignKey("EmployeeIdId");
 
-                    b.Navigation("ExpenseForm");
+                    b.Navigation("EmployeeId");
                 });
 
-            modelBuilder.Entity("ExpenseManager.Models.Entities.ExpenseForm", b =>
+            modelBuilder.Entity("ExpenseManager.Models.Entities.ExpenseDetail", b =>
                 {
-                    b.HasOne("ExpenseManager.Models.Entities.Accountant", null)
-                        .WithMany("PaidExpenseForms")
-                        .HasForeignKey("AccountantId");
-
-                    b.HasOne("ExpenseManager.Models.Entities.Employee", "Employee")
-                        .WithMany("ExpenseForms")
-                        .HasForeignKey("EmployeeId")
+                    b.HasOne("ExpenseManager.Models.Entities.Expense", "Expense")
+                        .WithMany("ExpenseDetails")
+                        .HasForeignKey("ExpenseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ExpenseManager.Models.Entities.Manager", null)
-                        .WithMany("ApprovedExpenseForms")
+                    b.Navigation("Expense");
+                });
+
+            modelBuilder.Entity("ExpenseManager.Models.Entities.User", b =>
+                {
+                    b.HasOne("ExpenseManager.Models.Entities.User", "Manager")
+                        .WithMany()
                         .HasForeignKey("ManagerId");
 
-                    b.Navigation("Employee");
+                    b.Navigation("Manager");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -512,33 +438,9 @@ namespace ExpenseManager.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ExpenseManager.Models.Entities.Employee", b =>
+            modelBuilder.Entity("ExpenseManager.Models.Entities.Expense", b =>
                 {
-                    b.HasOne("ExpenseManager.Models.Entities.Manager", null)
-                        .WithMany("Employees")
-                        .HasForeignKey("ManagerId");
-                });
-
-            modelBuilder.Entity("ExpenseManager.Models.Entities.ExpenseForm", b =>
-                {
-                    b.Navigation("Expenses");
-                });
-
-            modelBuilder.Entity("ExpenseManager.Models.Entities.Accountant", b =>
-                {
-                    b.Navigation("PaidExpenseForms");
-                });
-
-            modelBuilder.Entity("ExpenseManager.Models.Entities.Employee", b =>
-                {
-                    b.Navigation("ExpenseForms");
-                });
-
-            modelBuilder.Entity("ExpenseManager.Models.Entities.Manager", b =>
-                {
-                    b.Navigation("ApprovedExpenseForms");
-
-                    b.Navigation("Employees");
+                    b.Navigation("ExpenseDetails");
                 });
 #pragma warning restore 612, 618
         }

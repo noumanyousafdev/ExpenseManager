@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using ExpenseManager.Models.Entities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -10,45 +12,40 @@ namespace ExpenseManager.Data
 {
     public static class SeedData
     {
-        public static async Task SeedInitial(IServiceProvider serviceProvider)
+        public static async Task SeedInitial(IServiceProvider serviceProvider, IConfiguration configuration)
         {
             using var scope = serviceProvider.CreateScope();
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
 
-            // Seed Roles if they don't exist
-            var roles = new List<IdentityRole>
-        {
-            new IdentityRole
+            var roles = new List<string> { "Admin", "Manager", "Accountant", "Employee" };
+            foreach (var roleName in roles)
             {
-                Id = "5bd1711f-38cc-47ce-960b-242d82b86a18",
-                Name = "Admin",
-                NormalizedName = "ADMIN",
-            },
-            new IdentityRole
-            {
-                Id = "7c1a9a70-8c4b-4c99-8d09-5e4c8b4e3e15",
-                Name = "Manager",
-                NormalizedName = "MANAGER",
-            },
-            new IdentityRole
-            {
-                Id = "8a7b1c90-19b6-4e72-b6c9-5a1c8c8e1f26",
-                Name = "Employee",
-                NormalizedName = "EMPLOYEE",
-            },
-            new IdentityRole
-            {
-                Id = "d29f2b99-8f8b-4c89-9b0c-5b6f4d8920a3",
-                Name = "Accountant",
-                NormalizedName = "ACCOUNTANT",
-            }
-        };
-
-            foreach (var role in roles)
-            {
-                if (!await roleManager.RoleExistsAsync(role.Name))
+                if (!await roleManager.RoleExistsAsync(roleName))
                 {
-                    await roleManager.CreateAsync(role);
+                    await roleManager.CreateAsync(new IdentityRole(roleName));
+                }
+            }
+
+            var adminEmail = configuration["AppSettings:UserEmail"];
+            var adminUserName = configuration["AppSettings:AdminUserName"];  
+            var adminPassword = configuration["AppSettings:UserPassword"];
+
+            var adminUser = await userManager.FindByEmailAsync(adminEmail);
+            if (adminUser == null)
+            {
+                var newAdminUser = new User
+                {
+                    UserName = adminUserName, 
+                    Email = adminEmail,
+                    FirstName = "Admin",
+                    LastName = "User"
+                };
+
+                var createAdminResult = await userManager.CreateAsync(newAdminUser, adminPassword);
+                if (createAdminResult.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(newAdminUser, "Admin");
                 }
             }
         }

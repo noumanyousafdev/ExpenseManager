@@ -17,7 +17,6 @@ namespace ExpenseManager.API.Controllers
             this.authService = authService;
         }
 
-        // POST: api/Auth/Register
         [HttpPost("Register")]
         public async Task<IActionResult> Register(RegisterDto registerDto)
         {
@@ -25,7 +24,6 @@ namespace ExpenseManager.API.Controllers
             return ReturnFormattedResponse(response);
         }
 
-        // POST: api/Auth/Login
         [HttpPost("Login")]
         public async Task<IActionResult> Login(LoginDto loginDto)
         {

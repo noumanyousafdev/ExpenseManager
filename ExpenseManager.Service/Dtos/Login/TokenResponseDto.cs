@@ -6,12 +6,10 @@ using System.Threading.Tasks;
 
 namespace ExpenseManager.Service.Dtos.Login
 {
-    public class LoginResponseDto
+    public class TokenResponseDto
     {
         public string JwtToken { get; set; }
-        public string Username { get; set; }
-        public string UserId { get; set; }
-        public List<string> Roles { get; set; }
         public DateTime Expiration { get; set; }
     }
+
 }
