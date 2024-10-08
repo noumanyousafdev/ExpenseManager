@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using ExpenseManager.DAL.Repositories.Expenses;
 using ExpenseManager.Service.Mappings;
 using ExpenseManager.Service.Services.Authentication;
+using ExpenseManager.Service.Services.Expenses;
 using System.ComponentModel.Design;
 using Task.GenericRepository;
 
@@ -14,6 +16,7 @@ namespace ExpenseManager.API.Extensions
 
 
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IExpenseService, ExpenseService>();
 
 
         }
@@ -22,6 +25,7 @@ namespace ExpenseManager.API.Extensions
         {
             // Register all repositories
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            services.AddScoped<IExpenseRepository, ExpenseRepository>();
 
 
 

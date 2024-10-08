@@ -8,8 +8,12 @@ namespace ExpenseManager.Models.Entities
 {
     public class Expense : BaseModel
     {
-        public Guid Id { get; set; } 
-        public User EmployeeId {  get; set; }
+        public Guid Id { get; set; }
+        // Foreign key to the User (Employee)
+        public string EmployeeId { get; set; }
+
+        // Navigation property to User
+        public virtual User Employee { get; set; }
         public decimal TotalAmount { get; set; }  
         public string Currency { get; set; }
         public string Description { get; set; }

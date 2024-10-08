@@ -17,4 +17,3 @@ namespace ExpenseManager.Models.Entities
     }
 }
 
-// Virtual keyword 

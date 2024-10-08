@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ExpenseManager.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class InitalMigration : Migration
+    public partial class IntialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -165,7 +165,7 @@ namespace ExpenseManager.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ExpenseDetails",
+                name: "Expenses",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -183,9 +183,9 @@ namespace ExpenseManager.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ExpenseDetails", x => x.Id);
+                    table.PrimaryKey("PK_Expenses", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ExpenseDetails_AspNetUsers_EmployeeIdId",
+                        name: "FK_Expenses_AspNetUsers_EmployeeIdId",
                         column: x => x.EmployeeIdId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
@@ -216,15 +216,15 @@ namespace ExpenseManager.Data.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_ApprovalHistories_ExpenseDetails_ExpenseId",
+                        name: "FK_ApprovalHistories_Expenses_ExpenseId",
                         column: x => x.ExpenseId,
-                        principalTable: "ExpenseDetails",
+                        principalTable: "Expenses",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Expenses",
+                name: "ExpenseDetails",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -238,11 +238,11 @@ namespace ExpenseManager.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Expenses", x => x.Id);
+                    table.PrimaryKey("PK_ExpenseDetails", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Expenses_ExpenseDetails_ExpenseId",
+                        name: "FK_ExpenseDetails_Expenses_ExpenseId",
                         column: x => x.ExpenseId,
-                        principalTable: "ExpenseDetails",
+                        principalTable: "Expenses",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -307,14 +307,14 @@ namespace ExpenseManager.Data.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ExpenseDetails_EmployeeIdId",
+                name: "IX_ExpenseDetails_ExpenseId",
                 table: "ExpenseDetails",
-                column: "EmployeeIdId");
+                column: "ExpenseId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Expenses_ExpenseId",
+                name: "IX_Expenses_EmployeeIdId",
                 table: "Expenses",
-                column: "ExpenseId");
+                column: "EmployeeIdId");
         }
 
         /// <inheritdoc />
@@ -339,13 +339,13 @@ namespace ExpenseManager.Data.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Expenses");
+                name: "ExpenseDetails");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "ExpenseDetails");
+                name: "Expenses");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ExpenseManager.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241007171343_InitalMigration")]
-    partial class InitalMigration
+    [Migration("20241008202936_SecondMigration")]
+    partial class SecondMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -75,7 +75,7 @@ namespace ExpenseManager.Data.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("EmployeeIdId")
+                    b.Property<string>("EmployeeId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("IsDeleted")
@@ -98,9 +98,9 @@ namespace ExpenseManager.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EmployeeIdId");
+                    b.HasIndex("EmployeeId");
 
-                    b.ToTable("ExpenseDetails");
+                    b.ToTable("Expenses");
                 });
 
             modelBuilder.Entity("ExpenseManager.Models.Entities.ExpenseDetail", b =>
@@ -134,7 +134,7 @@ namespace ExpenseManager.Data.Migrations
 
                     b.HasIndex("ExpenseId");
 
-                    b.ToTable("Expenses");
+                    b.ToTable("ExpenseDetails");
                 });
 
             modelBuilder.Entity("ExpenseManager.Models.Entities.User", b =>
@@ -371,11 +371,11 @@ namespace ExpenseManager.Data.Migrations
 
             modelBuilder.Entity("ExpenseManager.Models.Entities.Expense", b =>
                 {
-                    b.HasOne("ExpenseManager.Models.Entities.User", "EmployeeId")
+                    b.HasOne("ExpenseManager.Models.Entities.User", "Employee")
                         .WithMany()
-                        .HasForeignKey("EmployeeIdId");
+                        .HasForeignKey("EmployeeId");
 
-                    b.Navigation("EmployeeId");
+                    b.Navigation("Employee");
                 });
 
             modelBuilder.Entity("ExpenseManager.Models.Entities.ExpenseDetail", b =>
